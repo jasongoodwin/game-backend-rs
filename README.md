@@ -7,6 +7,9 @@ For messages, I would use a binary protocol like protocol buffers, and then comp
 
 I'll add more details as I go, this is a first look. This omits region segmentation, and cross region replication, but it's easy to see how you would make this work with kafka for example, where you can just replicate events at the expense of a bunch of latency on any events that are cross-regional. Likely you just want to keep users on regional global servers playing on instanced game servers where players are matched based on approximated latency to sub-regions. 
 
+For real time games, you'll want to have latency compensation (extrapolation, interpolation), and some mechanism of error correction (eg "pop" or "rubber band" to reconcile client and server state as latency compensation.) 
+That's possibly outside of scope but I might revisit these components. If these features are built in the client/server, then also we want to talk about monitoring the prediction window, how many messages are _outside_ of the prediction window (eg pruned events) and the prediction error as metrics to evaluate the functioning of the system behavior across different metric dimensions. The general approach would be to hold a series of states across ticks (prediction window) and if something like a "shoot" event is received, then we need to wheel back through the window and roll forward the events to ensure that bullets fired by a user are compensating for latency to give a better user experience. This is an imperfect approach, and it favours players with lower ping as their fire events will be received first, but it's a good balance between fairness and exeperience.
+
 # Game Backend Architecture Document
 
 ``` mermaid
@@ -94,7 +97,7 @@ The backend architecture is designed to support a scalable, resilient, and secur
 
 Our backend leverages modern cloud-native technologies:
 
-- **Game Engine**: Godot Engine for both client and server components
+- **Game Engine**: Godot Engine for client, custom rust server components (although Godot could be used here.)
 - **Networking**: ENet protocol with DTLS encryption for real-time communication
 - **Container Orchestration**: Kubernetes for scaling and managing game server instances
 - **Event Bus**: Apache Kafka for service communication and event sourcing
@@ -220,8 +223,8 @@ The game server infrastructure dynamically scales to match player demand:
 
 - Matchmaking Service for pairing players based on skill and preferences
 - Instance Servers running actual game sessions
-- Kubernetes orchestration for automatic scaling
-- Game Data DB for storing game state and player progress
+- Kubernetes orchestration for automatic scaling, especially in managing the instance servers
+- Game Data DB for storing game state and player progress (Wallet/NFT features to come later for NFTs with Utility)
 
 ## Event System & Real-time Communication
 
@@ -244,7 +247,7 @@ The system employs different communication patterns based on requirements:
 
 - **Request-Response**: For authenticated API calls through the gateway
 - **Pub/Sub**: For game events and notifications via Kafka
-- **WebSocket/ENet**: For real-time game state updates and chat
+- **WebSocket/ENet**: For real-time game state updates and chat. ENet offers multiple channels, reliable and unreliable messaging, and ordering over UDP so is suitable for most use cases over a single UDP connection.
 - **Event Sourcing**: For game replay and state reconstruction capabilities
 
 ## Monitoring & Operations
@@ -256,7 +259,7 @@ Our comprehensive monitoring solution ensures reliable operation and quick probl
 The monitoring system tracks key performance indicators:
 
 - Server health (CPU, memory, network usage)
-- Game metrics (matches/hour, concurrent players, queue times)
+- Game metrics (matches/hour, concurrent players, queue times, errors, client versions)
 - Business metrics (user engagement, retention rates)
 - Network performance (latency, packet loss, connection stability)
 
