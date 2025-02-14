@@ -60,13 +60,6 @@ graph TB
     %% Logging
     AG & LS & GCS & MS & IS & TS --> L
 
-    %% Styling
-    style TS fill:#ccf
-    style K fill:#fcf
-    style K8S fill:#cfc
-    style Auth fill:#fee
-    style EntryPoint fill:#dfd
-    style EventSystem fill:#eff
 ```
 
 # Harvest Battles: Card Game & Farming Simulator Backend
