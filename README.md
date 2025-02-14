@@ -71,7 +71,7 @@ graph TB
 
 ```
 
-# Harvest Battles: Card Game & Farming Simulator Backend
+# Harvest Battles/Gene Weaver: Card Game & Farming Simulator Backend
 
 ## Introduction
 
