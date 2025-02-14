@@ -332,4 +332,150 @@ These loops intersect through:
 - Rewards feeding back into farming economy
 - Future NFT integration for both systems
 
-NFT integration.
+
+## Web3 Integration
+
+The game's Web3 features are designed to enhance player ownership and economic opportunities while maintaining traditional gaming appeal.
+
+### NFT Implementation
+
+Our NFT system will focus on meaningful digital ownership:
+
+- **Card NFTs**: Unique cards can be minted as NFTs, with attributes including:
+  - Rarity and edition numbers
+  - Crafting history and originating player
+  - Battle statistics and achievements
+  - Visual customizations
+
+- **Land NFTs**: Future expansion allowing ownership of premium farming plots:
+  - Unique resource generation rates
+  - Special crafting capabilities
+  - Customizable appearances
+  - Rentable to other players
+
+### Blockchain Integration
+
+The system will utilize a hybrid approach:
+
+- **Layer 2 Solution**: Using ImmutableX/Polygon for:
+  - Low transaction costs
+  - High transaction throughput
+  - Environmental sustainability
+  - Seamless user experience
+
+- **Smart Contracts**: Managing:
+  - NFT minting and trading
+  - Marketplace functionality
+  - Governance mechanisms
+  - Revenue sharing
+
+### Web3 Architecture Components
+
+New services will be added to support Web3 features:
+
+- **Wallet Service**: Managing player wallet connections
+- **NFT Metadata Service**: Handling NFT attributes and updates
+- **Marketplace Service**: Supporting NFT trading
+- **Blockchain Indexer**: Tracking on-chain events
+
+## Deployment & DevOps
+
+### Infrastructure as Code
+
+All infrastructure is defined using:
+
+- Terraform for cloud resources
+- Helm charts for Kubernetes deployments
+- GitHub Actions for CI/CD pipelines
+
+### Deployment Environments
+
+- **Development**: Local Kubernetes cluster with simulated load
+- **Staging**: Cloud-based replica of production
+- **Production**: Multi-region deployment with:
+  - Geographic load balancing
+  - Regional game servers
+  - Distributed databases
+  - CDN for static assets
+
+### Scaling Strategy
+
+The system scales both vertically and horizontally:
+
+- **Auto-scaling** based on:
+  - Current player count
+  - Match queue length
+  - Server resource utilization
+  - Geographic demand
+
+- **Regional Deployment**:
+  - Game servers near player populations
+  - Database replication across regions
+  - Content delivery optimization
+
+## Security & Compliance
+
+### Network Security
+
+- **DDoS Protection**:
+  - Cloud provider DDoS mitigation
+  - Rate limiting at API Gateway
+  - Traffic filtering and analysis
+
+- **Encryption**:
+  - TLS 1.3 for HTTPS
+  - DTLS for game traffic
+  - End-to-end encryption for sensitive data
+
+### Game Security
+
+- **Anti-Cheat Measures**:
+  - Server-side validation
+  - Client integrity checking
+  - Behavior analysis
+  - Automated suspension system
+
+- **Smart Contract Security**:
+  - External audits
+  - Formal verification
+  - Bug bounty program
+  - Upgradeable contract design
+
+### Data Protection
+
+- **Player Data**:
+  - GDPR compliance
+  - Data minimization
+  - Regular security audits
+  - Encrypted backups
+
+- **Wallet Security**:
+  - No private key storage
+  - Secure wallet linking
+  - Transaction signing verification
+
+## Future Roadmap
+
+### Phase 1: Core Gaming (Current)
+- Basic card game mechanics
+- Farming system implementation
+- Matchmaking and rankings
+- Social features
+
+### Phase 2: Web3 Foundation
+- Wallet integration
+- Basic NFT minting
+- Marketplace foundation
+- Token economics design
+
+### Phase 3: Advanced Features
+- Land NFT system
+- Guild system
+- Tournament infrastructure
+- Cross-chain functionality
+
+### Phase 4: Ecosystem Growth
+- Developer API
+- Custom card creation tools
+- Community governance
+- E-sports integration
