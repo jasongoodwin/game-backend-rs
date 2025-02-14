@@ -69,262 +69,267 @@ graph TB
     style EventSystem fill:#eff
 ```
 
-# 1. Overview
+# Harvest Battles: Card Game & Farming Simulator Backend
 
-This document describes the architecture for the backend of a multiplayer card game with crafting/farming elements. The architecture is designed for scalability, resilience, and security, leveraging microservices, containerization, and event-driven communication.
+## Introduction
 
-# 2. Components
+Harvest Battles is a unique multiplayer game that combines strategic card battles with farming simulation elements, designed to create an engaging player experience that bridges traditional gaming with Web3 technology. The game allows players to cultivate resources, craft cards, battle other players, and eventually mint their unique cards as NFTs.
 
-Clients: Godot game clients (desktop, mobile, or web).
+## System Architecture Overview
 
-API Gateway (AG):
+The backend architecture is designed to support a scalable, resilient, and secure gaming environment. It employs a microservices architecture deployed on Kubernetes, using event-driven communication patterns to ensure responsiveness and reliability.
 
-Entry point for all client requests.
+### Key Features
 
-Handles authentication/authorization (delegating to the Login Service and Token Service).
+- Real-time card battles with secure multiplayer networking
+- Persistent farming and resource management systems
+- Crafting system for creating unique cards
+- Future NFT integration for card ownership and trading
+- Cross-platform support (desktop, mobile, web)
+- Scalable infrastructure supporting thousands of concurrent players
 
-Performs rate limiting to prevent DoS attacks.
+### Technical Stack
 
-Routes requests to the appropriate backend services.
+Our backend leverages modern cloud-native technologies:
 
-Can transform requests (e.g., adding headers).
+- **Game Engine**: Godot Engine for both client and server components
+- **Networking**: ENet protocol with DTLS encryption for real-time communication
+- **Container Orchestration**: Kubernetes for scaling and managing game server instances
+- **Event Bus**: Apache Kafka for service communication and event sourcing
+- **Databases**: 
+  - Cloud SQL/Cloud Spanner for user and game data
+  - Redis for caching and real-time state management
+- **Security**: 
+  - API Gateway for request management and rate limiting
+  - Token-based authentication with dedicated service
+  - HTTPS/DTLS encryption for all communication
+- **Monitoring**: 
+  - Prometheus and Grafana for metrics and alerting
+  - ELK Stack for centralized logging
 
-Technology: Kong, Tyk, AWS API Gateway, Azure API Management, or similar.
+## Service Architecture
 
-Authentication (Auth) Subsystem:
+Our backend is composed of several key service groups, each handling specific aspects of the game:
 
-Login Service (LS):
+### Entry Points
 
-REST API for user authentication.
+The system provides two main entry points for clients:
 
-Validates credentials against the User Database.
+1. **API Gateway**: Handles HTTP/REST requests for non-real-time operations such as:
+   - User authentication
+   - Resource management
+   - Game state queries
+   - Future NFT operations
 
-Interacts with the Token Service to generate session tokens.
+2. **Global Connection Server**: Manages real-time connections using ENet/WebSockets for:
+   - Live game sessions
+   - Real-time notifications
+   - Chat functionality
+   - Player presence management
 
-Publishes user_login events to Kafka.
+### Authentication System
 
-Technology: Python (Flask/FastAPI), Node.js (Express), Go, or similar.
+The authentication system ensures secure access to game resources through:
 
-User Database (DB):
+- Login Service for credential validation and session management
+- Token Service for secure session handling
+- User Database for account management
+- Integration points for future Web3 wallet authentication
 
-Stores user account information (usernames, hashed passwords, etc.).
+### Game Servers
 
-Technology: Cloud SQL, Cloud Spanner (GCP), or similar.
+The game server infrastructure dynamically scales to match player demand:
 
-Token Service (TS):
+- Matchmaking Service for pairing players based on skill and preferences
+- Instance Servers running actual game sessions
+- Kubernetes orchestration for automatic scaling
+- Game Data DB for storing game state and player progress
 
-Generates, validates, and revokes security tokens (session tokens, game server access tokens).
+# Harvest Battles: Card Game & Farming Simulator Backend
 
-Uses strong cryptography (HMAC-SHA256 or RSA signatures).
+## Introduction
 
-Stores tokens securely.
+Harvest Battles is a unique multiplayer game that combines strategic card battles with farming simulation elements, designed to create an engaging player experience that bridges traditional gaming with Web3 technology. The game allows players to cultivate resources, craft cards, battle other players, and eventually mint their unique cards as NFTs.
 
-Technology: Go, Python, Node.js, with libraries like PyJWT or golang-jwt/jwt.
+## System Architecture Overview
 
-Game Servers Subsystem:
+The backend architecture is designed to support a scalable, resilient, and secure gaming environment. It employs a microservices architecture deployed on Kubernetes, using event-driven communication patterns to ensure responsiveness and reliability.
 
-Global Connection Server (GCS):
+### Key Features
 
-Godot server (headless).
+- Real-time card battles with secure multiplayer networking
+- Persistent farming and resource management systems
+- Crafting system for creating unique cards
+- Future NFT integration for card ownership and trading
+- Cross-platform support (desktop, mobile, web)
+- Scalable infrastructure supporting thousands of concurrent players
 
-Maintains persistent connections (ENet with DTLS or WebSockets) with clients.
+### Technical Stack
 
-Validates session tokens (using the Token Service).
+Our backend leverages modern cloud-native technologies:
 
-Manages client state.
+- **Game Engine**: Godot Engine for both client and server components
+- **Networking**: ENet protocol with DTLS encryption for real-time communication
+- **Container Orchestration**: Kubernetes for scaling and managing game server instances
+- **Event Bus**: Apache Kafka for service communication and event sourcing
+- **Databases**: 
+  - Cloud SQL/Cloud Spanner for user and game data
+  - Redis for caching and real-time state management
+- **Security**: 
+  - API Gateway for request management and rate limiting
+  - Token-based authentication with dedicated service
+  - HTTPS/DTLS encryption for all communication
+- **Monitoring**: 
+  - Prometheus and Grafana for metrics and alerting
+  - ELK Stack for centralized logging
 
-Pushes global notifications to clients (received from Kafka).
+## Service Architecture
 
-Forwards requests to the Matchmaking Service.
+Our backend is composed of several key service groups, each handling specific aspects of the game:
 
-Handles lightweight chat.
+### Entry Points
 
-Matchmaking Service (MS):
+The system provides two main entry points for clients:
 
-Queues players for matches.
+1. **API Gateway**: Handles HTTP/REST requests for non-real-time operations such as:
+   - User authentication
+   - Resource management
+   - Game state queries
+   - Future NFT operations
 
-Implements matchmaking logic.
+2. **Global Connection Server**: Manages real-time connections using ENet/WebSockets for:
+   - Live game sessions
+   - Real-time notifications
+   - Chat functionality
+   - Player presence management
 
-Requests new game server instances from Kubernetes (via the Kubernetes API).
+### Authentication System
 
-Publishes match_found events to Kafka.
+The authentication system ensures secure access to game resources through:
 
-Provides game server connection information to clients (via the GCS).
+- Login Service for credential validation and session management
+- Token Service for secure session handling
+- User Database for account management
+- Integration points for future Web3 wallet authentication
 
-Kubernetes (K8S):
+### Game Servers
 
-Container orchestration platform.
+The game server infrastructure dynamically scales to match player demand:
 
-Manages the Instanced Game Servers.
+- Matchmaking Service for pairing players based on skill and preferences
+- Instance Servers running actual game sessions
+- Kubernetes orchestration for automatic scaling
+- Game Data DB for storing game state and player progress
 
-Instanced Game Servers (IS1, IS2, ISN):
+## Event System & Real-time Communication
 
-Godot server builds (headless).
+The event system serves as the backbone of our real-time gaming infrastructure, enabling seamless communication between services and maintaining game state consistency.
 
-Run the actual game logic for a single match/farming instance.
+### Kafka Event Bus
 
-Communicate with clients via ENet (with DTLS).
+Our event bus handles several critical streams of information:
 
-Validate session tokens (using the Token Service).
+- **User Events**: Login/logout, friend requests, achievements
+- **Game Events**: Match starts/ends, player actions, resource updates
+- **System Events**: Server scaling, performance metrics, error reporting
+- **Future Web3 Events**: NFT mints, trades, marketplace activities
 
-Enforce game rules.
+Events are structured with clear schemas and versioning, allowing for system evolution while maintaining backward compatibility.
 
-Publish game-related events to Kafka.
+### Real-time Communication Patterns
 
-Kafka Event Bus (K):
+The system employs different communication patterns based on requirements:
 
-Asynchronous communication between services.
+- **Request-Response**: For authenticated API calls through the gateway
+- **Pub/Sub**: For game events and notifications via Kafka
+- **WebSocket/ENet**: For real-time game state updates and chat
+- **Event Sourcing**: For game replay and state reconstruction capabilities
 
-Decouples services.
+## Monitoring & Operations
 
-Used for event sourcing (for monitoring).
+Our comprehensive monitoring solution ensures reliable operation and quick problem resolution.
 
-Technology: Apache Kafka, Confluent Cloud, or similar.
+### Metrics & Alerting
 
-Chat Service (CS):
+The monitoring system tracks key performance indicators:
 
-Handles real-time chat functionality (optional, could be integrated into the GCS for smaller scale).
+- Server health (CPU, memory, network usage)
+- Game metrics (matches/hour, concurrent players, queue times)
+- Business metrics (user engagement, retention rates)
+- Network performance (latency, packet loss, connection stability)
 
-Can use WebSockets or ENet.
+Custom alerts are configured for:
 
-Game Data DB (GD):
+- Service degradation or failures
+- Unusual player behavior patterns
+- Security incidents
+- Resource utilization thresholds
 
-Stores persistent game data (card definitions, crafting recipes, etc.).
+### Logging & Diagnostics
 
-Technology: Cloud SQL, Cloud Spanner, or similar.
+Centralized logging provides:
 
-Monitoring Subsystem:
+- Structured logs in JSON format for easy querying
+- Request tracing across services
+- Error aggregation and analysis
+- Audit trails for security events
 
-Metrics & Alerting (M):
+## Data Flows
 
-Collects and stores metrics from all services (CPU, memory, request latency, error rates, ENet connections, Kafka lag, etc.).
+### Player Authentication Flow
 
-Provides dashboards and alerting for critical conditions.
+1. Client connects to API Gateway with credentials
+2. Gateway routes to Login Service
+3. Login Service validates against User Database
+4. Token Service generates session token
+5. Client receives token and connects to Global Connection Server
+6. All subsequent requests include the validated token
 
-Technology: Prometheus, Grafana, Datadog, GCP Monitoring, or similar.
+### Matchmaking & Game Session Flow
 
-Logging Service (L):
+1. Player requests match through Global Connection Server
+2. Matchmaking Service processes request and queues player
+3. When match is found:
+   - New game instance is provisioned in Kubernetes
+   - Players receive connection details
+   - Instance Server validates players via Token Service
+4. Game session begins with encrypted ENet communication
+5. Game state updates are persisted to Game Data DB
+6. Match results trigger events for rewards and statistics
 
-Centralized logging for all services.
+(if lower latency gameplay is needed, kafka should not be used as an intermediate, but the user should connect directly to the instance server, and events should be generated async out of the instance server and put into kafka for telemetry data.) 
 
-Uses structured logging (JSON format).
+### Resource Management Flow
 
-Allows for searching, filtering, and analysis of logs.
+1. Player farming actions are validated by Instance Servers
+2. Resource updates are persisted to Game Data DB
+3. Crafting requests are validated against player inventory
+4. New cards are created and added to player collection
+5. Future: NFT minting process for eligible cards
 
-Technology: Elasticsearch, Logstash, Kibana (ELK stack), Fluentd, GCP Logging, or similar.
+## Game Loop Integration
 
-# 3. Data Flow (Example: Login and Matchmaking)
+The game combines two main loops that interact seamlessly:
 
-Client sends credentials to the API Gateway.
+### Farming Loop
 
-API Gateway forwards the request to the Login Service.
+- Resource cultivation and management
+- Time-based growth and harvesting mechanics
+- Resource market interactions
+- Crafting system for creating new cards
 
-Login Service validates credentials against the User Database.
+### Battle Loop
 
-Login Service requests a session token from the Token Service.
+- Deck building and management
+- Matchmaking and game sessions
+- Real-time card battles
+- Ranking and reward systems
 
-Token Service generates the token and returns it to the Login Service.
+These loops intersect through:
 
-Login Service returns the session token to the client (via the API Gateway).
-
-Login Service publishes a user_login event to Kafka.
-
-Client connects to the Global Connection Server (GCS) using the session token.
-
-GCS validates the token with the Token Service.
-
-Client sends a "find_match" request to the GCS.
-
-GCS forwards the request to the Matchmaking Service.
-
-Matchmaking Service queues the player and finds a match.
-
-Matchmaking Service requests a new game server instance from Kubernetes (if needed).
-
-Matchmaking Service publishes a match_found event to Kafka.
-
-Matchmaking Service sends game server connection info to the GCS.
-
-GCS relays the connection info to the client.
-
-Client connects to the Instanced Game Server via ENet (with DTLS), including the session token.
-
-Instanced Game Server validates the session token with the Token Service.
-
-The game begins.
-
-# 4. Technology Stack
-
-Godot Engine: Game client and server development.
-
-ENet: Real-time networking (with DTLS).
-
-Kubernetes: Container orchestration.
-
-Kafka: Event bus.
-
-Python/Flask/FastAPI, Node.js/Express, Go: For REST APIs (Login Service, Matchmaking Service).
-
-Cloud SQL/Cloud Spanner (GCP): Databases.
-
-Redis/Memcached: Caching.
-
-Prometheus/Grafana/Datadog: Metrics and alerting.
-
-ELK Stack/Fluentd/GCP Logging: Logging.
-
-Kong/Tyk/AWS API Gateway/Azure API Management: API Gateway (optional, but recommended).
-
-Hashicorp Vault / Cloud Provider Secret Manager Secret storage.
-
-# 5. Security Considerations
-
-DTLS for ENet: Encrypt all ENet communication.
-
-HTTPS for REST APIs: Use HTTPS for all API communication.
-
-Session Tokens: Use cryptographically secure session tokens, managed by a dedicated Token Service.
-
-API Gateway: Centralized authentication, authorization, and rate limiting.
-
-Input Validation: Validate all input on the server-side.
-
-Database Security: Use SSL/TLS, restricted access, and least privilege for database connections.
-
-Secret Management: Store secrets securely using a dedicated secret management service.
-
-Monitoring and Alerting
-
-# 6. Day 1 Features
-
-Core Game Loop: Basic card game mechanics, farming/crafting (simplified), and a single common area.
-
-Login/Authentication: User registration (handled externally), login with session token generation.
-
-Global Connection Server: Persistent connections, basic user presence (online/offline), friend login notifications.
-
-Matchmaking (Basic): A simple queue-based matchmaking system.
-
-Instanced Game Servers: Ability to start and play a basic card game match.
-
-ENet Communication (with DTLS): Secure communication between clients and game servers.
-
-Kafka Eventing (Basic): user_login, match_found, game_started, game_ended events.
-
-Metrics and Logging: Basic metrics (CPU, memory, request counts) and logging for all services.
-
-Database Persistence: User accounts, basic player inventory, card definitions.
-
-Kubernetes Deployment: Deployment of game servers to Kubernetes.
-
-Token service
-
-# 7. Future Enhancements
-
-Sharding
-
-More advanced matchmaking
-
-More complex farming.
+- Resource requirements for card crafting
+- Card usage in battles
+- Rewards feeding back into farming economy
+- Future NFT integration for both systems
 
 NFT integration.
