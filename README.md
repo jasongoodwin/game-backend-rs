@@ -1,9 +1,11 @@
-# Document Introduction and Extra Notes
+# v0.0.1 - Document Introduction and Extra Notes
 
-This is my stab at an architecture for a globally scalable real-time farming simulator and card battler.
-This is not EXACTLY how I would structure a multiplayer FPS or other game type which requires optimizing for latency above _all else_ but it's suitable for games like an MMO such as FFXIV where there is a global cool down and tick can be like 5 or 10hz without interfering with gameplay experience.
+This is my stab at an architecture for a globally scalable online real-time farming simulator and card battler.
+This is not EXACTLY how I would structure a multiplayer FPS or other game types which requires optimizing for latency above _all else_ but it's suitable for games like an MMO such as FFXIV where there is a global cool down and tick can be like 5 or 10hz without interfering with gameplay experience.
 If you wanted to build a twitch-shooter or another game with extreme low latency requirements, I'd just get an ENet connection or similar directly to the instanced server, and have the instanced server emit events to kafka async outside of the core gameloop on dedicated threads given less priority than the core loop and player connection threads.
 For messages, I would use a binary protocol like protocol buffers, and then compress them with snappy or LZ4 or whatever is hot today. That puts a bit of load on the server, but the reduction in bandwidth vs the cpu cost/time of compression/decompression will result in faster byte transfer and lower network congestion, which would improve the scalability and consistency of the performance characteristics of the server. For a card battler, this will be less important so some of these details are omitted and will be harder for someone less experienced to understand how to implement. It's not hard but it's not what people will be used to doing.
+
+I'll add more details as I go, this is a first look. This omits region segmentation, and cross region replication, but it's easy to see how you would make this work with kafka for example, where you can just replicate events at the expense of a bunch of latency on any events that are cross-regional. Likely you just want to keep users on regional global servers playing on instanced game servers where players are matched based on approximated latency to sub-regions. 
 
 # Game Backend Architecture Document
 
