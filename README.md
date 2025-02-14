@@ -9,6 +9,11 @@ graph TB
     end
 
     subgraph Backend
+        subgraph EntryPoint[Entry Points]
+            AG[API Gateway]
+            GCS[Global Connection Server]
+        end
+
         subgraph Auth[Authentication]
             LS[Login Service]
             DB[User Database]
@@ -16,64 +21,52 @@ graph TB
         end
 
         subgraph GameServers[Game Servers]
-            GCS[Global Connection Server]
             MS[Matchmaking Service]
             subgraph K8S[Kubernetes]
-                IS1[Instance Server 1]
-                IS2[Instance Server 2]
-                ISN[Instance Server N]
+                IS[Instance Servers]
             end
+            GD[Game Data DB]
         end
-        AG[API Gateway]
-        K[Kafka Event Bus]
-        CS[Chat Service]
-        GD[Game Data DB]
 
-        subgraph Monitoring
-            M[Metrics & Alerting]
-            L[Logging Service]
+        subgraph EventSystem[Event & Monitoring]
+            K[Kafka Event Bus]
+            CS[Chat Service]
+            M[Metrics]
+            L[Logging]
         end
     end
 
-    %% Authentication flow
+    %% Main flows
     C1 & C2 & C3 --> AG
+    C1 & C2 & C3 --> GCS
+    
+    %% Auth flow
     AG --> LS
     LS --> DB
-    LS --> TS
-    TS --> LS
-    LS --> GCS
-    GCS --> TS
-
-    %% Game server connections
-    C1 & C2 & C3 --> GCS
-    GCS --> MS
-    MS --> K8S
-    IS1 & IS2 & ISN --> GD
-    K8S --> IS1 & IS2 & ISN
+    LS <--> TS
+    GCS <--> TS
     
+    %% Game flow
+    GCS --> MS
+    MS --> IS
+    IS --> GD
 
-    %% Event system (for Monitoring)
-    GCS -.-> K
-    LS -.-> K
-    IS1 & IS2 & ISN -.-> K
-    MS -.-> K
+    %% Event system
+    GCS & LS & MS & IS -.-> K
     K -.-> CS
     CS --> GCS
     K --> M
-    GCS --> L
-    LS --> L
-    IS1 & IS2 & ISN --> L
-    MS --> L
-    AG --> L
-    TS --> L
+
+    %% Logging
+    AG & LS & GCS & MS & IS & TS --> L
 
     %% Styling
     style TS fill:#ccf
     style K fill:#fcf
     style K8S fill:#cfc
-    style GameServers fill:#eee
     style Auth fill:#fee
-    style Monitoring fill:#ccf
+    style EntryPoint fill:#dfd
+    style EventSystem fill:#eff
 ```
 
 # 1. Overview
